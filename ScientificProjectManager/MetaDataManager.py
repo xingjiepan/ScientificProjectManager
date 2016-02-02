@@ -11,7 +11,6 @@ import time
 import atexit
 from ProjectInfo       import ProjectInfo  
 from ProjectLog        import ProjectLog  
-from DirForest         import DirForest  
 from ProjectGraph      import ProjectGraph  
 from DataFileOperation import DataFileOperation 
 
@@ -43,7 +42,6 @@ class MetaDataManager():
     
     #Create metadata files 
     self.createNewProjectInfo( a_currentHost )
-    self.createNewDirForest( a_currentHost )
     self.createNewProjectLog( a_currentHost )
     self.createNewProjectGraph()
     return
@@ -62,45 +60,15 @@ class MetaDataManager():
     hostInfo         = ET.SubElement( projectInfo, 'hostInfo' )
     currentHost      = ET.SubElement( hostInfo, 'currentHost' )
     hostList         = ET.SubElement( hostInfo, 'hostList'    )
-    host             = ET.SubElement( hostList, 'host'        )
+    host             = ET.SubElement( hostList, a_currentHost )
+    homeAbsPath      = ET.SubElement( host, 'homeAbsPath'     )
+   
     currentHost.text = a_currentHost
-    host.text        = a_currentHost
+    homeAbsPath.text = os.path.abspath('.')
 
     #Save the projectInfo.xml file
     fXml = open('.scientificProjectManager/projectInfo.xml', 'w')
     fXml.write( utilities.getPrettyXmlString( projectInfo ) )
-    fXml.close() 
-    return
-
-  def createNewDirForest( self, a_currentHost ):
-    '''
-    create a new dirForest.xml file
-    '''
-    #If the projectInfo.xml file is already been created, return
-    if os.path.exists( '.scientificProjectManager/dirForest.xml' ):
-      print "The .scientificProjectManager/dirForest.xml is already been created!"
-      return
-
-    #Create the XML tree of the directory forest
-    dirForest        = ET.Element('dirForest')
-    dirTree          = ET.SubElement( dirForest, 'dirTree'  )
-    host             = ET.SubElement( dirTree, 'host'       )
-    homeAbsPath      = ET.SubElement( dirTree, 'homeAbsPath')
-    home             = ET.SubElement( dirTree, 'home'       )
-    subdirs          = ET.SubElement( home   , 'subdirs'    )
-    files            = ET.SubElement( home   , 'files'      )
-    dataDir          = ET.SubElement( subdirs, 'data'       ) 
-    dataSubdirs      = ET.SubElement( dataDir, 'subdirs'    )
-    dataFiles        = ET.SubElement( dataDir, 'files'      )
-    eDataDir         = ET.SubElement( dataSubdirs, 'externalData' ) 
-    eDataSubdirs     = ET.SubElement( eDataDir, 'subdirs'   )
-    eDataFiles       = ET.SubElement( eDataDir, 'files'     )
-    host.text        = a_currentHost
-    homeAbsPath.text = os.path.abspath('.')
-
-    #Save the projectLog.xml file
-    fXml = open('.scientificProjectManager/dirForest.xml', 'w')
-    fXml.write( utilities.getPrettyXmlString( dirForest ) )
     fXml.close() 
     return
   
@@ -151,28 +119,43 @@ class MetaDataManager():
 
   def loadMetaData( self ):
     '''
-    Load metadata from the drictory .scientificProjectManager and return initialized objects of ProjectInfo, DirForest, ProjectLog, ProjectGraph and DataFileOperation 
+    Load metadata from the drictory .scientificProjectManager and return initialized objects of ProjectInfo, ProjectLog, ProjectGraph and DataFileOperation 
     '''
     #Create objects of the metadat handlers
-    pI = ProjectInfo( '.scientificProjectManager/projectInfo.xml' )
-    pL = ProjectLog( '.scientificProjectManager/projectLog.xml' )
-    dF = DirForest( '.scientificProjectManager/dirForest.xml', pI, pL)
-    pG = ProjectGraph( '.scientificProjectManager/projectGraph.xml' )
-    dO = DataFileOperation( pI, pL, dF )
+    self.pI = ProjectInfo( '.scientificProjectManager/projectInfo.xml' )
+    self.pL = ProjectLog( '.scientificProjectManager/projectLog.xml' )
+    self.pG = ProjectGraph( '.scientificProjectManager/projectGraph.xml' )
+    self.dO = DataFileOperation( self.pI, self.pL )
     
     #Register destruct functions 
-    atexit.register( pI.destruct )
-    atexit.register( pL.destruct )
-    atexit.register( dF.destruct )
-    atexit.register( pG.destruct )
+    atexit.register( self.pI.destruct )
+    atexit.register( self.pL.destruct )
+    atexit.register( self.pG.destruct )
 
-    #Initialize the metadata
-    dF.initializeFromRealDir()
    
-    return  ( pI, pL, dF, pG, dO )
+    return  ( self.pI, self.pL, self.pG, self.dO )
 
   def createRemoteWorkSpace( self, a_host, a_homeAddr ):
     '''
     Create a remote work space on a given host and copy all metadata there.
     '''
+    if self.pI.hostExists( a_host ):
+      print 'The remote host '+a_host+' already exists!'
+      return
+    self.pI.addHost( a_host, a_homeAddr )
+    currentHost    = self.pI.getCurrentHost()
+    currentHomeAbs = self.pI.getHomeAbsPath() 
+
+    #This is a trick to create a empty data directory in the remote host
+    subprocess.call( [ 'rsync', '-av', os.path.join( currentHomeAbs, '.scientificProjectManager/scratch' ), a_host+':'+os.path.join(a_homeAddr,'data') ] )  
+    
+    #Temporarily change the current host into the remote host
+    self.pI.setCurrentHost( a_host )
+    self.pI.saveToFile( self.pI.xmlFileName )
+    #Synchronize the metadata and the interface to the remote host
+    utilities.syncFilesToRemote( currentHomeAbs, ['SMPInterface.py','.scientificProjectManager'], a_host, a_homeAddr)
+
+    #Change the currenthost name back
+    self.pI.setCurrentHost( currentHost )
+     
     return

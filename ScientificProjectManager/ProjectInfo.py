@@ -29,21 +29,21 @@ class ProjectInfo():
     '''
     Return True if a host exists in the host list
     '''
-    hostExist = False
-    for host in self.xmlRoot.find('hostInfo').find('hostList'):
-      if a_host == host.text:
-        hostExist = True
-    return hostExist
+    if None == self.xmlRoot.find('hostInfo').find('hostList').find( a_host ):
+      return False
+    else:
+      return True
 
-  def addHost( self, a_host ):
+  def addHost( self, a_host, a_homeAbsPath ):
     '''
     Add a host to the host list
     '''
     if self.hostExists( a_host ):
       return
     else:
-      newHost = ET.SubElement( self.xmlRoot.find('hostInfo').find('hostList'), 'host' )
-      newHost.text = a_host 
+      newHost          = ET.SubElement( self.xmlRoot.find('hostInfo').find('hostList'), a_host )
+      homeAbsPath      = ET.SubElement( newHost, 'homeAbsPath' )
+      homeAbsPath.text = a_homeAbsPath
     return
 
   def getCurrentHost( self ):
@@ -62,3 +62,15 @@ class ProjectInfo():
     else:
       raise Exception( 'The host '+ a_host +' is not in the host list!' ) 
     return
+
+  def getHomeAbsPath( self, a_host='' ):
+    '''
+    Return the absolute path of the project home at a_host. 
+    '''
+    if a_host == '':
+      host = self.getCurrentHost()
+    elif not self.hostExists( a_host ):
+      raise Exception( 'The host '+a_host+' does not exist!' )
+    else:
+      host = a_host
+    return self.xmlRoot.find('hostInfo').find('hostList').find( host ).find('homeAbsPath').text
