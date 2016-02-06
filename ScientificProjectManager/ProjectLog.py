@@ -32,4 +32,11 @@ class ProjectLog():
     '''
     timeNow = time.strftime('%Y_%m_%d_%H_%M_%S')
     print timeNow, a_host, a_event
+    record     = ET.SubElement( self.xmlRoot, 'record' )
+    eTime      = ET.SubElement( record, 'time' ) 
+    host       = ET.SubElement( record, 'host' ) 
+    event      = ET.SubElement( record, 'event' )
+    eTime.text = timeNow
+    host.text  = a_host
+    event.text = a_event 
     return 

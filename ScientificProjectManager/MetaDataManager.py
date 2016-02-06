@@ -33,6 +33,7 @@ class MetaDataManager():
     #Create data and metadata directories 
     subprocess.call( [ 'mkdir', 'data' ] )
     subprocess.call( [ 'mkdir', 'data/externalData' ] )
+    subprocess.call( [ 'mkdir', 'data/manuallyProcessedData' ] )
     subprocess.call( [ 'mkdir', '.scientificProjectManager' ] )
     subprocess.call( [ 'mkdir', '.scientificProjectManager/scratch' ] )
     subprocess.call( [ 'mkdir', '.scientificProjectManager/scripts' ] )

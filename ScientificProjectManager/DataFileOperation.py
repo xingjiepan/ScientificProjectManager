@@ -23,6 +23,13 @@ class DataFileOperation():
     '''
     return os.path.join( self.pI.getHomeAbsPath( a_host ), a_addr )
 
+  def exists( self, a_addr ):
+    '''
+    Return true if a file or directory exists  
+    The file address should be the relative address to the project home.
+    '''
+    return os.path.exists( self.getAbsAddr( a_addr ) )
+
   def open( self, a_fileAddr, a_method='r' ):
     '''
     To open a file. 
