@@ -30,6 +30,13 @@ class DataFileOperation():
     '''
     return os.path.exists( self.getAbsAddr( a_addr ) )
 
+  def ls( self, a_addr ):
+    '''
+    List the content of a directory.
+    The address should be the relative address to the project home.
+    '''
+    return os.listdir( self.getAbsAddr( a_addr ) )
+
   def open( self, a_fileAddr, a_method='r' ):
     '''
     To open a file. 
