@@ -3,6 +3,7 @@
 ProjectGraph manages the project graph
 '''
 
+import os.path
 import xml.etree.ElementTree as ET
 import utilities
 
@@ -30,8 +31,9 @@ class ProjectGraph():
     '''
     Return true if a node exists. Also return the node element if it exists.
     '''
+    nodeNorm = os.path.normpath( a_node )
     for node in self.xmlRoot.find('nodes'):
-      if node.text == a_node:
+      if node.text == nodeNorm:
         return ( True, node ) 
     return ( False, None )
 
@@ -39,8 +41,10 @@ class ProjectGraph():
     '''
     Return true if an edge exists. Also return the edge element if it exists.
     '''
+    nodeInNorm  = os.path.normpath( a_nodeIn )
+    nodeOutNorm = os.path.normpath( a_nodeOut )
     for edge in self.xmlRoot.find('edges'):
-      if edge.find('from').text == a_nodeIn and edge.find('to').text == a_nodeOut:
+      if edge.find('from').text == nodeInNorm and edge.find('to').text == nodeOutNorm:
         return ( True, edge )
     return ( False, None )
    
@@ -48,47 +52,54 @@ class ProjectGraph():
     '''
     Add a node to the graph
     '''
-    if self.nodeExists( a_node )[0]:
+    nodeNorm = os.path.normpath( a_node )
+    if self.nodeExists( nodeNorm )[0]:
       return
     node      = ET.SubElement( self.xmlRoot.find('nodes'), 'node' )
-    node.text = a_node
+    node.text = nodeNorm
     return  
  
   def addEdge( self, a_nodeIn, a_nodeOut ):
     '''
     Add an edge to the graph
     '''
-    if self.edgeExists( a_nodeIn, a_nodeOut )[0]:
+    nodeInNorm  = os.path.normpath( a_nodeIn )
+    nodeOutNorm = os.path.normpath( a_nodeOut )
+    if self.edgeExists( nodeInNorm, nodeOutNorm )[0]:
       return
     
-    self.addNode( a_nodeIn )
-    self.addNode( a_nodeOut )
+    self.addNode( nodeInNorm )
+    self.addNode( nodeOutNorm )
     edge      = ET.SubElement( self.xmlRoot.find('edges'), 'edge' )
     nIn       = ET.SubElement( edge, 'from' )
     nOut      = ET.SubElement( edge, 'to' )
-    nIn.text  = a_nodeIn
-    nOut.text = a_nodeOut
+    nIn.text  = nodeInNorm
+    nOut.text = nodeOutNorm
     return
 
   def removeNode( self, a_node ):
     '''
     Remove a node if it exists.
     '''
-    nodeExists = self.nodeExists( a_node )
+    nodeNorm = os.path.normpath( a_node )
+    #Remove all edges to this node, while keep all edges from this node. This won't mess up dependency
+    for edge in self.xmlRoot.find('edges'):
+      if edge.find('to').text == nodeNorm:
+        self.removeEdge( edge.find('from').text, nodeNorm ) 
+    #Remove the node
+    nodeExists = self.nodeExists( nodeNorm )
     if not nodeExists[0]:
         return
     self.xmlRoot.find('nodes').remove( nodeExists[1] )
-    #Also remove all edges attached to this node
-    for node in self.xmlRoot.find('nodes'):
-      self.removeEdge( a_node, node.text ) 
-      self.removeEdge( node.text, a_node ) 
     return
 
   def removeEdge( self, a_nodeIn, a_nodeOut ):
     '''
     Remove an edge if it exists.
     '''
-    edgeExists = self.edgeExists( a_nodeIn, a_nodeOut )
+    nodeInNorm  = os.path.normpath( a_nodeIn )
+    nodeOutNorm = os.path.normpath( a_nodeOut )
+    edgeExists = self.edgeExists( nodeInNorm, nodeOutNorm )
     if edgeExists[0]:
       self.xmlRoot.find('edges').remove( edgeExists[1] ) 
     return
