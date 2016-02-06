@@ -44,6 +44,12 @@ class ResearchStep(object):
     elif a_io == 'o':
       return os.path.join( self.stepDir, 'outputDataSets', self.outputDataSet, a_addr )  
     return
+
+  def absAddr( self, a_addr, a_io ):
+    '''
+    Given an address relative to the input data set or output data set, retur its absolute address
+    '''
+    return self.dO.getAbsAddr( self.relativeToHome( a_addr, a_io ) )
  
   def addStepToGraph( self ):
     '''
