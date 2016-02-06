@@ -32,7 +32,8 @@ class ResearchStep(object):
     self.stepDir       = a_stepDir
     self.inputDataSet  = a_inputDataSet
     self.outputDataSet = a_outputDataSet
-    self.manDataSet    = a_manDataSet 
+    self.manDataSet    = a_manDataSet
+    self.manDataPath   = os.path.join( 'data/manuallyProcessedData', self.manDataSet ) 
     return
  
   def relativeToHome( self, a_addr, a_io ):
@@ -106,18 +107,17 @@ class ResearchStep(object):
       self.dO.rm( self.relativeToHome('', 'o') )
       self.pG.removeNode( self.relativeToHome('', 'o') ) 
     if (a_dataSet == 'm' or a_dataSet == '') and self.manDataSet != '':
-      self.dO.rm( os.path.join('data/manuallyProcessedData', self.manDataSet) )
-      self.pG.removeNode( os.path.join('data/manuallyProcessedData', self.manDataSet) ) 
+      self.dO.rm( self.manDataPath )
+      self.pG.removeNode( self.manDataPath ) 
     return
 
   def createManuallyProcessDataSet( self ):
     '''
     Create a data set in the manuallyProcessedData directory and make it depend on the output data set in the project graph    
     '''
-    manDataSet = os.path.join('data/manuallyProcessedData', self.manDataSet)
-    if self.dO.exists( manDataSet ):
-      raise Exception( 'The manually processed data set '+manDataSet+' already exists!' )
+    if self.dO.exists( self.manDataPath ):
+      raise Exception( 'The manually processed data set '+self.manDataPath+' already exists!' )
     else:
-      self.dO.mkdir( manDataSet )
-      self.pG.addEdge( self.relativeToHome('', 'o'), manDataSet )  
+      self.dO.mkdir( self.manDataPath )
+      self.pG.addEdge( self.relativeToHome('', 'o'), self.manDataPath )  
     return
