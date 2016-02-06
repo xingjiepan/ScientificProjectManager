@@ -24,7 +24,7 @@ class ResearchStep(object):
   run()                   #Either run the job locally or submit it to a cluster. It takes a tasklist as argument to determine which task to run    
    
   '''
-  def __init__( self, a_meta, a_stepDir, a_inputDataSet, a_outputDataSet ):
+  def __init__( self, a_meta, a_stepDir, a_inputDataSet, a_outputDataSet, a_manDataSet='' ):
     self.pI            = a_meta[0]
     self.pL            = a_meta[1]
     self.pG            = a_meta[2]
@@ -32,6 +32,7 @@ class ResearchStep(object):
     self.stepDir       = a_stepDir
     self.inputDataSet  = a_inputDataSet
     self.outputDataSet = a_outputDataSet
+    self.manDataSet    = a_manDataSet 
     return
  
   def relativeToHome( self, a_addr, a_io ):
@@ -81,5 +82,36 @@ class ResearchStep(object):
       self.dO.mkdir( self.relativeToHome('', 'i') )
       for d in iDirList:
         self.dO.mkdir( self.relativeToHome( d, 'i' ))
+    
+    #Create manually processed data set
+    if self.manDataSet != '':
+      self.createManuallyProcessDataSet()
 
     return 
+
+  def clear( self, a_dataSet = '' ):
+    '''
+    Clear input, output or manually processed data sets. If a_dataSet is not given, remove all of them. 
+    '''
+    if a_dataSet == 'i' or a_dataSet == '':
+      self.dO.rm( self.relativeToHome('', 'i') )
+      self.pG.removeNode( self.relativeToHome('', 'i') ) 
+    if a_dataSet == 'o' or a_dataSet == '':
+      self.dO.rm( self.relativeToHome('', 'o') )
+      self.pG.removeNode( self.relativeToHome('', 'o') ) 
+    if (a_dataSet == 'm' or a_dataSet == '') and self.manDataSet != '':
+      self.dO.rm( os.path.join('data/manuallyProcessedData', self.manDataSet) )
+      self.pG.removeNode( os.path.join('data/manuallyProcessedData', self.manDataSet) ) 
+    return
+
+  def createManuallyProcessDataSet( self ):
+    '''
+    Create a data set in the manuallyProcessedData directory and make it depend on the output data set in the project graph    
+    '''
+    manDataSet = os.path.join('data/manuallyProcessedData', self.manDataSet)
+    if self.dO.exists( manDataSet ):
+      raise Exception( 'The manually processed data set '+manDataSet+' already exists!' )
+    else:
+      self.dO.mkdir( manDataSet )
+      self.pG.addEdge( self.relativeToHome('', 'o'), manDataSet )  
+    return
