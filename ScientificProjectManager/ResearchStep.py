@@ -107,17 +107,17 @@ class ResearchStep(object):
       self.dO.rm( self.relativeToHome('', 'o') )
       self.pG.removeNode( self.relativeToHome('', 'o') ) 
     if (a_dataSet == 'm' or a_dataSet == '') and self.manDataSet != '':
-      self.dO.rm( self.manDataPath )
-      self.pG.removeNode( self.manDataPath ) 
+      self.pG.removeEdge( self.relativeToHome('','o'), self.manDataPath )
+      if self.pG.getDegree( self.manDataPath, 'i' ) == 0:
+        self.dO.rm( self.manDataPath )
+        self.pG.removeNode( self.manDataPath ) 
     return
 
   def createManuallyProcessDataSet( self ):
     '''
     Create a data set in the manuallyProcessedData directory and make it depend on the output data set in the project graph    
     '''
-    if self.dO.exists( self.manDataPath ):
-      raise Exception( 'The manually processed data set '+self.manDataPath+' already exists!' )
-    else:
+    if not self.dO.exists( self.manDataPath ):
       self.dO.mkdir( self.manDataPath )
-      self.pG.addEdge( self.relativeToHome('', 'o'), self.manDataPath )  
+    self.pG.addEdge( self.relativeToHome('', 'o'), self.manDataPath )  
     return
