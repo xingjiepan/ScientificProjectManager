@@ -47,6 +47,22 @@ class ProjectGraph():
       if edge.find('from').text == nodeInNorm and edge.find('to').text == nodeOutNorm:
         return ( True, edge )
     return ( False, None )
+
+  def getDegree( self, a_node, a_type ):
+    '''
+    Return the indegree or outdegree of a node
+    '''
+    nodeNorm = os.path.normpath( a_node )
+    if not self.nodeExists( nodeNorm ):
+      raise Exception( 'The node '+nodeNorm+' does not exist!' )
+
+    degree = 0 
+    for edge in self.xmlRoot.find('edges'):
+      if a_type == 'i' and edge.find('to').text == nodeNorm:
+        degree += 1
+      if a_type == 'o' and edge.find('from').text == nodeNorm:
+        degree += 1
+    return degree
    
   def addNode( self, a_node ):
     '''
