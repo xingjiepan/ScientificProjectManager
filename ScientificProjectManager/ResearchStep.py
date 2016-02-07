@@ -56,9 +56,8 @@ class ResearchStep(object):
     '''
     Add this step into the project graph
     '''
-    self.pG.addEdge( self.relativeToHome('','i'), self.relativeToHome('','o') )
     for d in self.dependencyList:
-      self.pG.addEdge( d, self.relativeToHome('','i') )  
+      self.pG.addEdge( d, self.relativeToHome('','o') )  
     return
 
   def createIODirs( self, iDirList, oDirList ):
@@ -102,7 +101,6 @@ class ResearchStep(object):
     '''
     if a_dataSet == 'i' or a_dataSet == '':
       self.dO.rm( self.relativeToHome('', 'i') )
-      self.pG.removeNode( self.relativeToHome('', 'i') ) 
     if a_dataSet == 'o' or a_dataSet == '':
       self.dO.rm( self.relativeToHome('', 'o') )
       self.pG.removeNode( self.relativeToHome('', 'o') ) 
