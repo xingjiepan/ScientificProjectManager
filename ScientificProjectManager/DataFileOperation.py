@@ -7,6 +7,7 @@ import os
 import xml.etree.ElementTree as ET
 import utilities
 import subprocess
+import re
 
 class DataFileOperation():
   '''
@@ -104,3 +105,27 @@ class DataFileOperation():
     remoteHomeAbs  = self.pI.getHomeAbsPath( a_remoteHost )
     utilities.syncFilesFromRemote( currentHomeAbs, a_fileList, a_remoteHost, remoteHomeAbs ) 
     return
+
+  def templateSubstituter( self, a_match ):
+    if not a_match.group(1) in self.subDict.keys():
+      raise Exception( 'Cannot replace ' + a_match.group(1) +' . No rule is given!' )
+    return self.subDict[ a_match.group(1) ]
+
+  def createFileFromTemplate( self, a_template, a_outputFile, a_subDict, a_identifier = '!@#\$' ):
+    '''
+    Create a file from a template.
+    a_template   is the template file address relative to the project home;
+    a_outputFile is the output file address relative to the project home;
+    a_subDict    is the dictionary that specifies substitutions to the template file. NOTE: the key must only contain word charactors (\w)!;
+    a_identifier is the mark that specifies variable places in the template file;  
+    '''
+    subPattern   = re.compile( a_identifier + '(\w+)' + a_identifier )
+    self.subDict = a_subDict    
+ 
+    fTemp = open( self.getAbsAddr(a_template) )
+    fOut  = open( self.getAbsAddr(a_outputFile), 'w' )
+    for line in fTemp.readlines():
+      fOut.write( subPattern.sub( self.templateSubstituter, line ) )
+    fTemp.close()
+    fOut.close() 
+    return 
