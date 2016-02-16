@@ -45,7 +45,7 @@ def syncFilesToRemote( a_currentHomeAbs, a_fileList, a_remoteHost, a_remoteHomeA
   Synchronize a set of files to the remote host.
   File addresses specified a_fileList should be relative addresses to the a_currentHomeAbs. 
   '''
-  subprocess.call( ['rsync']+getRsyncIncludeList( a_fileList )+[ '--exclude', '*', '-avrz', a_currentHomeAbs+'/', a_remoteHost+':'+a_remoteHomeAbs+'/'] ) 
+  subprocess.call( ['rsync', '--copy-links']+getRsyncIncludeList( a_fileList )+[ '--exclude', '*', '-avrz', a_currentHomeAbs+'/', a_remoteHost+':'+a_remoteHomeAbs+'/'] ) 
   return
 
 def syncFilesFromRemote( a_currentHomeAbs, a_fileList, a_remoteHost, a_remoteHomeAbs ):
@@ -53,5 +53,5 @@ def syncFilesFromRemote( a_currentHomeAbs, a_fileList, a_remoteHost, a_remoteHom
   Synchronize a set of files from the remote host.
   File addresses specified a_fileList should be relative addresses to the a_currentHomeAbs. 
   '''
-  subprocess.call( ['rsync']+getRsyncIncludeList( a_fileList )+[ '--exclude', '*', '-avrz', a_remoteHost+':'+a_remoteHomeAbs+'/', a_currentHomeAbs+'/'] ) 
+  subprocess.call( ['rsync', '--copy-links']+getRsyncIncludeList( a_fileList )+[ '--exclude', '*', '-avrz', a_remoteHost+':'+a_remoteHomeAbs+'/', a_currentHomeAbs+'/'] ) 
   return
