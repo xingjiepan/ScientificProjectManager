@@ -73,4 +73,4 @@ class ProjectInfo():
       raise Exception( 'The host '+a_host+' does not exist!' )
     else:
       host = a_host
-    return self.xmlRoot.find('hostInfo').find('hostList').find( host.strip() ).find('homeAbsPath').text
+    return self.xmlRoot.find('hostInfo').find('hostList').find( host.strip() ).find('homeAbsPath').text.strip()
