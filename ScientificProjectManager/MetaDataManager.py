@@ -136,6 +136,17 @@ class MetaDataManager():
    
     return  ( self.pI, self.pL, self.pG, self.dO )
 
+  def syncMetadataToRemote( self, a_host ):
+    '''
+    Synchronize metadata to the remote host.
+    Metadata must be load before calling this function 
+    '''
+    self.pI.destruct()
+    self.pL.destruct()
+    self.pG.destruct()
+    utilities.syncFilesToRemote( self.pI.getHomeAbsPath(), ['SMPInterface.py','.scientificProjectManager'], a_host, self.pI.getHomeAbsPath(a_host) )
+    return
+
   def createRemoteWorkSpace( self, a_host, a_homeAddr ):
     '''
     Create a remote work space on a given host and copy all metadata there.

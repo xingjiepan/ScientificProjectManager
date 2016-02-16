@@ -86,6 +86,14 @@ class DataFileOperation():
     subprocess.call( [ 'mv', self.getAbsAddr( a_origin ), self.getAbsAddr( a_target ) ] )
     return
 
+  def chmod( self, a_mode, a_file ):
+    '''
+    To changed the mode of a file
+    The file address should be the relative address to the project home.
+    '''
+    subprocess.call( ['chmod', a_mode, self.getAbsAddr( a_file ) ] )
+    return
+
   def syncToRemote( self, a_fileList, a_remoteHost ):
     '''
     Synchronize a list of files to the remote host.
@@ -128,4 +136,13 @@ class DataFileOperation():
       fOut.write( subPattern.sub( self.templateSubstituter, line ) )
     fTemp.close()
     fOut.close() 
-    return 
+    return
+
+  def saveXMLFile( self, a_xmlElement, a_fOut ):
+    '''
+    Save an XML element to a file.
+    Address of a_fOut should be relative to the project home.
+    '''
+    with open( self.getAbsAddr(a_fOut), 'w' ) as fOut:
+      fOut.write( utilities.getPrettyXmlString( a_xmlElement ) )  
+    return
