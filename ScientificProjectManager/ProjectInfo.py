@@ -50,7 +50,7 @@ class ProjectInfo():
     '''
     Get the name of current host 
     '''
-    return  self.xmlRoot.find('hostInfo').find('currentHost').text
+    return  self.xmlRoot.find('hostInfo').find('currentHost').text.strip()
 
   def setCurrentHost( self, a_host ):
     '''
@@ -58,7 +58,7 @@ class ProjectInfo():
     '''
     #If the host is in the list, set it to be the current host
     if self.hostExists( a_host ): 
-      self.xmlRoot.find('hostInfo').find('currentHost').text = a_host
+      self.xmlRoot.find('hostInfo').find('currentHost').text = a_host.strip()
     else:
       raise Exception( 'The host '+ a_host +' is not in the host list!' ) 
     return
