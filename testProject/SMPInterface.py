@@ -12,6 +12,8 @@ if __name__ == '__main__':
   inputParser = OptionParser()
   inputParser.add_option( '-i', '--init', action='store_true', help='Initialize the metadata.' )
   inputParser.add_option( '-c', '--create', action='store_true', help='Create a remote workspace.' )
+  inputParser.add_option( '-m', '--syncMeta', action='store_true', help='Syncrhonize metadata to a remote host.' )
+  inputParser.add_option( '-v', '--visualizeGraph', action='store', default='', help='Visualize the project graph.' )
   inputParser.add_option( '-s', '--step', action='store', help='Reserch step to run' )
   inputParser.add_option( '-b', '--substep', action='store', help='Research substep to run' )
   (options, args) = inputParser.parse_args()
@@ -26,12 +28,13 @@ if __name__ == '__main__':
 
   if options.create:
     metaDataManager.loadMetaData()
-    metaDataManager.createRemoteWorkSpace( 'QB3Cluster2', '/netapp/home/xingjiepan/test/SPM' )
+    metaDataManager.createRemoteWorkSpace( 'remote0', '/absolute/path/of/project/home/on/remote0' )
     exit()
 
   #If the metadata is already initialized, load the project script modules
   sys.path.append( './.scientificProjectManager/scripts' )
   from steps import *
+  from utilities import *
 
   #Load the metadata, objects of metadata classes are named as
   #ProjectInfo       pI;
@@ -40,37 +43,36 @@ if __name__ == '__main__':
   #DataFileOperation dO;
   #meta = ( pI, pL, pG, dO )
   meta = metaDataManager.loadMetaData()
+
+  #Synchronize metadata to remote host
+  if options.syncMeta:
+    metaDataManager.syncMetadataToRemote( 'remote0' )
    
+  #Visualize the project graph
+  if options.visualizeGraph != '':
+    graphVisualizer = SPM.GraphVisualizer( meta[2] )
+    if options.visualizeGraph == 'all':
+      graphVisualizer.showAll(True)
+    elif options.visualizeGraph == 'up':
+      graphVisualizer.showUpStreams( args[0], True ) 
+    exit()
 
   ############Scripting area for research steps##########
-  if options.step == 'test':
-    sTest = Step_test( meta, 'testIn', 'testOut', 'data/data/manuallyProcessedData/man')  
-    if options.substep == 'create':
-      sTest.createIODataSets()
-      
+  #Select motifs
+  if options.step == 'indent':
+    idXML = Step_indentXML( meta, 'particles', 'particles', 'data/externalData/particles' ) 
+    #idXML.clear()
+    idXML.createIODataSets()
+    idXML.run()
 
+  if options.step == 'wc1':
+    wc1 = Step_wordCount( meta, 'particles', 'particles', 'data/externalData/particles' )
+    #wc1.clear()
+    wc1.createIODataSets()
+    wc1.run()
 
-
-
-
-
-
-
-  #f = dO.open( 'data/test.txt', 'w' ) 
-  #f.close()
-  
-  #dO.rm( 'data/test.txt' )
-  #dO.mkdir( 'data/new' )
-  #dO.lns( 'data/test.txt', 'data/new' )
-  #dO.cp( 'data/test.txt', 'data/new/a' )
-  #dO.mv( 'data/test.txt', 'data/new/b' )
-  #dO.syncToRemote( ['data/externalData'], 'QB3Cluster2' )
-  #dO.syncFromRemote( ['data/eular'], 'QB3Cluster2' )
-  #print dO.exists( 'data/test.txt1' )
-
-  #pG.addNode( 'node1' )
-  #pG.addEdge( 'node1', 'node2' )
-  #pG.removeEdge( 'node1', 'node2' )
-  #pG.removeNode( 'node1' )
-
-  #pL.write( 'myLaptop', 'textEvent' )
+  if options.step == 'wc2':
+    wc2 = Step_wordCount( meta, 'particlesIndent', 'particlesIndent', 'data/Step_indentXML/outputDataSets/particles' )
+    #wc2.clear()
+    wc2.createIODataSets()
+    wc2.run()
