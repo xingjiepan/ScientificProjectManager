@@ -3,7 +3,7 @@
 ## 1. What does ScientificProjectManager do?
 The essence of many computational scientific projects is a dynamically growing graph of data processing. Each node is a dataset and each edge is a research step. The basic goal of ScientificProjectManager is to help scientists save their data as nodes of a graph and write their scripts as edges.
 
-ScientificProjectManager provides a set of tools that help users organize their working directory into the following standard form (which in fact represent a graph):
+ScientificProjectManager provides a set of tools that help users organize their working directory into the following standard form (which could be mapped to a graph):
 
 ```
 projectHome*/                             # The home of the project
