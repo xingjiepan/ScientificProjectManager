@@ -85,7 +85,18 @@ If the python module `networkx` and `pydot` is install on your computer, you can
 ```
 
 ### 2.5. Think your project as a graph
-Try to think your project as a graph, because it is.
+You may want to ask "Our data is still saved in a directory tree. How do you dare to say they are saved in a graph?" They are saved in a graph because of the following mapping
+```
+Nodes <- Datasets in data/externalData/
+         Datasets in data/manuallyProcessedData/
+         Datasets in data/user_defined_step*/outputDataSets/
+
+Edges <- Directory data/user_defined_step*/
+         Datasets in data/user_defined_step*/inputDataSets/  
+```   
+(Names end with \*, e.g. projectHome\*, are user defined names.)
+
+Think your project as a graph, because it is.
 
 ## 3. Important classes of ScientificProjectManager
 ### 3.1 ProjectInfo
