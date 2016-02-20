@@ -64,7 +64,7 @@ In your new project home, run
 ```
 ./SMPInterface.py -i indent
 ```
-Then you will find that a directory `Step_indentXML` is created under `data/` and inside `data/Step_indentXML/outputDataSets/particles/` are the XML file with indentation.
+Then you will find that a directory `Step_indentXML` is created under `data/` and inside `data/Step_indentXML/outputDataSets/particles/` are the XML files with indentation.
 
 Run
 ```
@@ -85,4 +85,24 @@ If the python module `networkx` and `pydot` is install on your computer, you can
 ```
 
 ### 2.5. Think your project as a graph
-Try to think your project as a graph, because it is.  
+Try to think your project as a graph, because it is.
+
+## 3. Important classes of ScientificProjectManager
+### 3.1 ProjectInfo
+Manages general information of this project, including IP addresses of computers involved and absolute pathes of the project home on different computers. Dumps data to projectInfo.xml.
+
+### 3.2 ProjectGraph
+Automatically add/remove nodes and edges of the graph when users add/remove datasets. Dumps data to projectGraph.xml.
+
+### 3.3 ProjectLog
+Automatically generate logs for users operation (not finished yet). Dumps data to projectLog.xml.
+
+### 3.4 DataFileOperation
+Provide a set of file operations (cp, mv, ls, ln…) with addresses relative to the project home, such that the effect of them are same on different computers.
+
+### 3.5 ResearchStep
+Base class of different research steps. Provide functions to manage datasets.
+
+### 3.6 MetaDataManger
+Manages all metadata, including projectInfo.xml, projectGraph.xml, projectLog.xml and all research step scripts. 
+ 
