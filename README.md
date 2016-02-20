@@ -94,7 +94,7 @@ Nodes <- Datasets in data/externalData/
 Edges <- Directory data/user_defined_step*/
          Datasets in data/user_defined_step*/inputDataSets/  
 ```   
-(Names end with \*, e.g. projectHome\*, are user defined names.)
+(Names end with \*, e.g. user\_defined\_step\*, are user defined names.)
 
 Think your project as a graph, because it is.
 
