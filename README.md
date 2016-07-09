@@ -98,7 +98,7 @@ Edges <- Directory data/user_defined_step*/
 
 But one thing to clarify is that the graph cannot be reconstructed solely from the information of the directory structure. Therefore the `projectGraph.xml` file is necessary.
 
-Think your project as a graph, because it is.
+Think your project as a graph, because it is!
 
 ## 3. Important classes of ScientificProjectManager
 ### 3.1 ProjectInfo
